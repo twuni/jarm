@@ -1,0 +1,107 @@
+version: 2
+
+defaults: &defaults
+  working_directory: "/docker/project"
+  docker:
+  - image: twuni/nodejs:11.1.0
+
+workflows:
+  version: 2
+  default:
+    jobs:
+    - build:
+        requires:
+        - install
+    - style:
+        requires:
+        - install
+    - install:
+        requires:
+        - initialize
+    - initialize
+    - test:
+        requires:
+        - install
+    - documentation:
+        requires:
+        - install
+
+jobs:
+  initialize:
+    <<: *defaults
+    steps:
+    - checkout
+    - persist_to_workspace:
+        root: /docker
+        paths:
+        - project
+  install:
+    <<: *defaults
+    steps:
+    - attach_workspace:
+        at: /docker
+    - restore_cache:
+        keys:
+        - v1-{{ checksum ".tool-versions" }}-yarn-lock-{{ checksum "yarn.lock" }}
+    - run:
+        name: Installing dependencies
+        command: |
+          yarn install --frozen-lockfile
+    - save_cache:
+        key: v1-{{ checksum ".tool-versions" }}-yarn-lock-{{ checksum "yarn.lock" }}
+        paths:
+        - node_modules
+    - persist_to_workspace:
+        root: /docker
+        paths:
+        - project/node_modules
+  style:
+    <<: *defaults
+    steps:
+    - attach_workspace:
+        at: /docker
+    - run:
+        name: Checking code style
+        command: |
+          mkdir -vp reports
+          yarn --silent lint --format junit --output-file reports/eslint.xml
+    - store_test_results:
+        path: reports
+  test:
+    <<: *defaults
+    steps:
+    - attach_workspace:
+        at: /docker
+    - run:
+        name: Testing
+        command: |
+          mkdir -vp reports/junit
+          yarn --silent test --reporter xunit > reports/junit/test-results.xml
+    - store_test_results:
+        path: reports/junit
+  build:
+    <<: *defaults
+    steps:
+    - attach_workspace:
+        at: /docker
+    - run:
+        name: Building assets for production
+        command: |
+          NODE_ENV=production yarn build
+    - store_artifacts:
+        path: lib
+    - persist_to_workspace:
+        root: /docker
+        paths:
+        - project/lib
+  documentation:
+    <<: *defaults
+    steps:
+    - attach_workspace:
+        at: /docker
+    - run:
+        name: Generating API documentation
+        command: |
+          yarn --silent documentation
+    - store_artifacts:
+        path: docs

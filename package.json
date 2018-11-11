@@ -1,0 +1,39 @@
+{
+  "name": "jarm",
+  "version": "0.1.0",
+  "description": "Jarm is JSON-API Relational Mapping -- an ORM layer for Node.js apps.",
+  "main": "index.js",
+  "repository": "https://github.com/twuni/jarm",
+  "author": {
+    "email": "devin@twuni.org",
+    "name": "Devin Canterberry"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "babel --only '**/index.js' --no-comments --compact true --minified --source-maps false --out-dir lib src; cp -vfR package.json yarn.lock README.md LICENSE lib/",
+    "clean": "rm -fR lib docs .nyc_output",
+    "coverage": "nyc report",
+    "docker:start": "yarn install && yarn build && yarn start",
+    "documentation": "rm -fR docs; (cd src; find . -type f -name index.js | xargs jsdoc --destination ../docs --package ../package.json --readme ../README.md)",
+    "lint": "eslint src",
+    "start": "node lib",
+    "test": "find src -type f -name spec.js | xargs nyc --silent --check-coverage --lines 100 --per-file mocha --require @babel/register src/spec.setup.js"
+  },
+  "devDependencies": {
+    "@babel/cli": "7.1.5",
+    "@babel/core": "7.1.5",
+    "@babel/plugin-proposal-class-properties": "7.1.0",
+    "@babel/polyfill": "7.0.0",
+    "@babel/preset-env": "7.1.5",
+    "@babel/register": "7.0.0",
+    "babel-eslint": "10.0.1",
+    "chai": "4.2.0",
+    "chai-as-promised": "7.1.1",
+    "eslint": "5.9.0",
+    "eslint-plugin-ante": "1.0.1",
+    "mocha": "5.2.0",
+    "nyc": "13.1.0",
+    "sinon": "7.1.1",
+    "sinon-chai": "3.2.0"
+  }
+}
