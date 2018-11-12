@@ -1,5 +1,7 @@
 # Jarm is JSON-API Relational Mapping
 
+[![CircleCI][1]][2]
+
 Define a schema for your JSON API resources and your relational database... at the same time!
 
 Pairs nicely with [@twuni/pg][3].
@@ -86,4 +88,6 @@ new PostgreSQL().connect().then(({ disconnect, write }) => {
 });
 ```
 
+[1]: https://circleci.com/gh/twuni/jarm.svg?style=svg
+[2]: https://circleci.com/gh/twuni/jarm
 [3]: https://github.com/twuni/pg.js
