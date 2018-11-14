@@ -63,7 +63,7 @@ const schema = {
 
 const store = new Store(schema);
 
-new PostgreSQL().connect().then(({ disconnect, write }) => {
+new PostgreSQL(Pool).connect().then(({ disconnect, write }) => {
   write(async (query) => {
     await store.createSchema()(query);
 
