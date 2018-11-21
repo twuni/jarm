@@ -87,6 +87,37 @@ describe('Store', () => {
 
       expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets');
     });
+
+    it('lists resources matching a specified attribute', async () => {
+      const schema = mockSchema();
+      const read = mockRead();
+
+      await new Store(schema).listResources({
+        attributes: {
+          priority: 123
+        }
+      })(read);
+
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE priority = $1');
+    });
+
+    it('lists resources matching a specified relationship', async () => {
+      const schema = mockSchema();
+      const read = mockRead();
+
+      await new Store(schema).listResources({
+        relationships: {
+          owner: {
+            data: {
+              id: '<UserId>',
+              type: 'user'
+            }
+          }
+        }
+      })(read);
+
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets LEFT JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2');
+    });
   });
 
   describe('#retrieveResource()', () => {
@@ -98,6 +129,34 @@ describe('Store', () => {
       await new Store(schema).retrieveResource(resourceIdentifier)(read);
 
       expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE id = $1');
+    });
+
+    it('retrieves related resources with the appropriate query', async () => {
+      const schema = mockSchema();
+      const read = mockRead();
+      const resourceIdentifier = mockResourceIdentifier();
+
+      await new Store(schema).retrieveResource(resourceIdentifier)(read);
+
+      expect(read).to.have.been.calledWith('SELECT owner_id, related_type FROM r_widgets_owner WHERE id = $1');
+    });
+
+    it('includes all related resources of a single named relationship', async () => {
+      const schema = mockSchema();
+      const read = mockRead();
+      const resourceIdentifier = mockResourceIdentifier();
+
+      read.withArgs('SELECT owner_id, related_type FROM r_widgets_owner WHERE id = $1').returns([
+        // eslint-disable-next-line camelcase
+        { owner_id: '<UserId:Alice>', related_type: 'user' },
+        // eslint-disable-next-line camelcase
+        { owner_id: '<UserId:Bob>', related_type: 'user' }
+      ]);
+
+      const resource = await new Store(schema).retrieveResource(resourceIdentifier)(read);
+
+      expect(resource).to.have.nested.property('relationships.owner.data[0].id', '<UserId:Alice>');
+      expect(resource).to.have.nested.property('relationships.owner.data[1].id', '<UserId:Bob>');
     });
   });
 
