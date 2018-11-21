@@ -3,7 +3,7 @@ const buildJoinClauseFromRelationships = (schema, relationships = {}, joins = []
     const { [definition.name]: relationship } = relationships;
 
     if (relationship) {
-      joins.push(`LEFT JOIN ${definition.table} ON ${schema.table}.${schema.id.name} = ${definition.table}.${schema.id.name}`);
+      joins.push(`INNER JOIN ${definition.table} ON ${schema.table}.${schema.id.name} = ${definition.table}.${schema.id.name}`);
     }
   }
 

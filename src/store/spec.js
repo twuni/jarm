@@ -116,7 +116,7 @@ describe('Store', () => {
         }
       })(read);
 
-      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets LEFT JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2');
+      expect(read).to.have.been.calledWith('SELECT widgets.id AS id, widgets.favorite_color AS favorite_color, widgets.priority AS priority FROM widgets INNER JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2');
     });
   });
 
