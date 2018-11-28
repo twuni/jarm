@@ -15,6 +15,8 @@ const createResource = (schema) => (resource) => async (write) => {
     ]);
   }).filter(Boolean));
 
+  resource.type = schema.resource;
+
   return resource;
 };
 
