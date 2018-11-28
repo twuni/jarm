@@ -1,7 +1,4 @@
-const toResourceAttributes = (definition, record) => definition.columns.reduce((attributes, { attribute, column }) => {
-  attributes[attribute] = record[column];
-  return attributes;
-}, {});
+import listResources from '../list-resources';
 
 const toResourceRelationship = (definition, records) => {
   const relationship = records.map((record) => definition.columns.reduce((attributes, { attribute, column }) => {
@@ -26,23 +23,18 @@ const toResourceRelationships = (definitions, recordSets) => definitions.reduce(
   return relationships;
 }, {});
 
-const toResource = (schema, record, relationships = []) => ({
-  attributes: toResourceAttributes(schema, record),
-  id: record[schema.id.name],
-  relationships: toResourceRelationships(schema.relationships, relationships),
-  type: schema.resource
-});
+const retrieveResource = (schema) => (query = {}) => async (read) => {
+  const [resource] = await listResources(schema)(query)(read);
 
-const retrieveResource = (schema) => ({ id }) => async (read) => {
-  const [record] = await read(`SELECT ${schema.id.name}, ${schema.columns.map(({ column }) => column).join(', ')} FROM ${schema.table} WHERE ${schema.id.name} = $1`, [id]);
-
-  if (!record) {
-    return record;
+  if (!resource) {
+    return resource;
   }
 
-  const relationships = await Promise.all(schema.relationships.map((relationship) => read(`SELECT ${relationship.columns.map(({ column }) => column).join(', ')} FROM ${relationship.table} WHERE ${schema.id.name} = $1`, [record.id])));
+  const relationships = await Promise.all(schema.relationships.map((relationship) => read(`SELECT ${relationship.columns.map(({ column }) => column).join(', ')} FROM ${relationship.table} WHERE ${schema.id.name} = $1`, [resource.id])));
 
-  return toResource(schema, record, relationships);
+  resource.relationships = toResourceRelationships(schema.relationships, relationships);
+
+  return resource;
 };
 
 export default retrieveResource;

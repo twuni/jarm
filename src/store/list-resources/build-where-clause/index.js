@@ -8,6 +8,14 @@ const buildWhereClauseFromAttributes = (schema, attributes = {}, where = []) => 
   return where;
 };
 
+const buildWhereClauseFromId = (schema, id, where = []) => {
+  if (typeof id !== 'undefined') {
+    where.push(`${schema.id.name} = $${where.length + 1}`);
+  }
+
+  return where;
+};
+
 const buildWhereClauseFromRelationships = (schema, relationships = {}, where = []) => {
   for (const definition of schema.relationships) {
     const { [definition.name]: relationship } = relationships;
@@ -30,6 +38,7 @@ const buildWhereClause = (schema, query = {}) => {
   const where = [];
 
   buildWhereClauseFromAttributes(schema, query.attributes, where);
+  buildWhereClauseFromId(schema, query.id, where);
   buildWhereClauseFromRelationships(schema, query.relationships, where);
 
   return where.length > 0 ? ` WHERE ${where.join(' AND ')}` : '';

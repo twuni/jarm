@@ -14,6 +14,8 @@ const createResource = (schema) => (resource) => async (write) => {
       ...relationship.columns.map(({ attribute }) => resource.relationships[relationship.name].data[attribute])
     ]);
   }).filter(Boolean));
+
+  return resource;
 };
 
 export default createResource;
