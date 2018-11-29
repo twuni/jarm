@@ -9,10 +9,17 @@ const updateResource = (schema) => (resource) => async (write) => {
       return undefined;
     }
 
-    return write(`UPDATE ${relationship.table} SET ${relationship.columns.map(({ column }, index) => `${column} = $${index + 2}`).join(', ')} WHERE ${schema.id.name} = $1`, [
+    let { relationships: { [relationship.name]: { data: rows } } } = resource;
+
+    if (typeof rows.length === 'undefined') {
+      rows = [rows];
+      resource.relationships[relationship.name].data = rows;
+    }
+
+    return Promise.all(rows.map((row) => write(`UPDATE ${relationship.table} SET ${relationship.columns.map(({ column }, index) => `${column} = $${index + 2}`).join(', ')} WHERE ${schema.id.name} = $1`, [
       resource.id,
-      ...relationship.columns.map(({ attribute }) => resource.relationships[relationship.name].data[attribute])
-    ]);
+      ...relationship.columns.map(({ attribute }) => row[attribute])
+    ])));
   }).filter(Boolean));
 
   resource.type = schema.resource;

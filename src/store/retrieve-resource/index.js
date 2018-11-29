@@ -1,16 +1,12 @@
 import listResources from '../list-resources';
 
 const toResourceRelationship = (definition, records) => {
-  const relationship = records.map((record) => definition.columns.reduce((attributes, { attribute, column }) => {
+  const relationships = records.map((record) => definition.columns.reduce((attributes, { attribute, column }) => {
     attributes[attribute] = record[column];
     return attributes;
   }, {}));
 
-  if (relationship.length === 1) {
-    return relationship[0];
-  }
-
-  return relationship;
+  return relationships;
 };
 
 const toResourceRelationships = (definitions, recordSets) => definitions.reduce((relationships, definition, index) => {

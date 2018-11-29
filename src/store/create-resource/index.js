@@ -9,10 +9,17 @@ const createResource = (schema) => (resource) => async (write) => {
       return undefined;
     }
 
-    return write(`INSERT INTO ${relationship.table} (${schema.id.name}, ${relationship.columns.map(({ column }) => column).join(', ')}) VALUES ($1, ${relationship.columns.map((a, index) => `$${index + 2}`).join(', ')})`, [
+    let { relationships: { [relationship.name]: { data: rows } } } = resource;
+
+    if (typeof rows.length === 'undefined') {
+      rows = [rows];
+      resource.relationships[relationship.name].data = rows;
+    }
+
+    return Promise.all(rows.map((row) => write(`INSERT INTO ${relationship.table} (${schema.id.name}, ${relationship.columns.map(({ column }) => column).join(', ')}) VALUES ($1, ${relationship.columns.map((a, index) => `$${index + 2}`).join(', ')})`, [
       resource.id,
-      ...relationship.columns.map(({ attribute }) => resource.relationships[relationship.name].data[attribute])
-    ]);
+      ...relationship.columns.map(({ attribute }) => row[attribute])
+    ])));
   }).filter(Boolean));
 
   resource.type = schema.resource;
