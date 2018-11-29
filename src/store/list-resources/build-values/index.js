@@ -10,6 +10,14 @@ const buildValuesFromAttributes = (schema, attributes = {}, values = []) => {
   return values;
 };
 
+const buildValuesFromId = (schema, id, values = []) => {
+  if (id) {
+    values.push(id);
+  }
+
+  return values;
+};
+
 const buildValuesFromRelationships = (schema, relationships = {}, values = []) => {
   for (const definition of schema.relationships) {
     const { [definition.name]: relationship } = relationships;
@@ -31,6 +39,7 @@ const buildValuesFromRelationships = (schema, relationships = {}, values = []) =
 const buildValues = (schema, query = {}) => {
   const values = [];
 
+  buildValuesFromId(schema, query.id, values);
   buildValuesFromAttributes(schema, query.attributes, values);
   buildValuesFromRelationships(schema, query.relationships, values);
 

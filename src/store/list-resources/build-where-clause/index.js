@@ -37,8 +37,8 @@ const buildWhereClauseFromRelationships = (schema, relationships = {}, where = [
 const buildWhereClause = (schema, query = {}) => {
   const where = [];
 
-  buildWhereClauseFromAttributes(schema, query.attributes, where);
   buildWhereClauseFromId(schema, query.id, where);
+  buildWhereClauseFromAttributes(schema, query.attributes, where);
   buildWhereClauseFromRelationships(schema, query.relationships, where);
 
   return where.length > 0 ? ` WHERE ${where.join(' AND ')}` : '';
