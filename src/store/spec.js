@@ -178,7 +178,7 @@ describe('Store', () => {
 
       await new Store(schema).updateResource(resource)(write);
 
-      expect(write).to.have.been.calledWith('UPDATE r_widgets_owner SET owner_id = $2, related_type = $3 WHERE id = $1');
+      expect(write).to.have.been.calledWith('INSERT INTO r_widgets_owner (id, owner_id, related_type) VALUES ($1, $2, $3) ON CONFLICT (id) DO UPDATE SET owner_id = EXCLUDED.owner_id, related_type = EXCLUDED.related_type');
     });
 
     it('does not attempt to update a relationship if not specified on the resource', async () => {
