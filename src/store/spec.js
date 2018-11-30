@@ -98,7 +98,7 @@ describe('Store', () => {
         }
       })(read);
 
-      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE priority = $1');
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE widgets.priority = $1');
     });
 
     it('lists resources matching a specified relationship', async () => {
@@ -128,7 +128,7 @@ describe('Store', () => {
 
       await new Store(schema).retrieveResource(resourceIdentifier)(read);
 
-      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE id = $1');
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE widgets.id = $1');
     });
 
     it('retrieves related resources with the appropriate query', async () => {

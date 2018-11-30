@@ -1,7 +1,7 @@
 const buildWhereClauseFromAttributes = (schema, attributes = {}, where = []) => {
   for (const { attribute, column } of schema.columns) {
     if (typeof attributes[attribute] !== 'undefined') {
-      where.push(`${column} = $${where.length + 1}`);
+      where.push(`${schema.table}.${column} = $${where.length + 1}`);
     }
   }
 
@@ -10,7 +10,7 @@ const buildWhereClauseFromAttributes = (schema, attributes = {}, where = []) => 
 
 const buildWhereClauseFromId = (schema, id, where = []) => {
   if (typeof id !== 'undefined') {
-    where.push(`${schema.id.name} = $${where.length + 1}`);
+    where.push(`${schema.table}.${schema.id.name} = $${where.length + 1}`);
   }
 
   return where;
