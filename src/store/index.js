@@ -17,6 +17,8 @@ const Store = function Store(schema) {
   this.destroyResource = destroyResource(schema);
   this.listResources = listResources(schema);
 
+  this.type = schema.resource;
+
   return this;
 };
 

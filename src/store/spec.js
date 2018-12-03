@@ -4,6 +4,15 @@ import { mockRead, mockResource, mockResourceIdentifier, mockSchema, mockWrite }
 import Store from '.';
 
 describe('Store', () => {
+  describe('#type', () => {
+    it('is the schema resource', () => {
+      const schema = mockSchema();
+      const store = new Store(schema);
+
+      expect(store.type).to.equal(schema.resource);
+    });
+  });
+
   describe('#createResource()', () => {
     it('creates the resource with the appropriate query', async () => {
       const schema = mockSchema();
