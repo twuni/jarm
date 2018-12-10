@@ -39,9 +39,6 @@ module.exports = {
           2
         ]
       }
-    ],
-    'prefer-destructuring': [
-      'off'
     ]
   }
 };
