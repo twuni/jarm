@@ -5,6 +5,8 @@ export const mockRead = () => stub().returns([
     // eslint-disable-next-line camelcase
     favorite_color: 'blue',
     id: '<RecordId>',
+    // eslint-disable-next-line camelcase
+    is_friendly: 1,
     priority: 123
   }
 ]);
@@ -12,6 +14,7 @@ export const mockRead = () => stub().returns([
 export const mockResource = ({ attributes, id, relationships, type } = {}) => ({
   attributes: attributes || {
     favoriteColor: 'yellow',
+    isFriendly: true,
     priority: 123
   },
   id: id || '<ResourceId>',
@@ -37,6 +40,11 @@ export const mockSchema = () => ({
     {
       attribute: 'favoriteColor',
       column: 'favorite_color'
+    },
+    {
+      attribute: 'isFriendly',
+      column: 'is_friendly',
+      type: 'smallint'
     },
     {
       column: 'priority',

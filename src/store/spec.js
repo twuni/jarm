@@ -21,7 +21,7 @@ describe('Store', () => {
 
       await new Store(schema).createResource(resource)(write);
 
-      expect(write).to.have.been.calledWith('INSERT INTO widgets (id, favorite_color, priority) VALUES ($1, $2, $3)');
+      expect(write).to.have.been.calledWith('INSERT INTO widgets (id, favorite_color, is_friendly, priority) VALUES ($1, $2, $3, $4)');
     });
 
     it('creates a relationship with the appropriate query', async () => {
@@ -52,7 +52,7 @@ describe('Store', () => {
 
       await new Store(schema).createSchema()(write);
 
-      expect(write).to.have.been.calledWith('CREATE TABLE IF NOT EXISTS widgets (id text NOT NULL, favorite_color text, priority smallint, PRIMARY KEY (id))');
+      expect(write).to.have.been.calledWith('CREATE TABLE IF NOT EXISTS widgets (id text NOT NULL, favorite_color text, is_friendly smallint, priority smallint, PRIMARY KEY (id))');
     });
 
     it('creates a relationship table with the appropriate query', async () => {
@@ -94,7 +94,7 @@ describe('Store', () => {
 
       await new Store(schema).listResources()(read);
 
-      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets');
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, is_friendly, priority FROM widgets');
     });
 
     it('lists resources matching a specified attribute', async () => {
@@ -107,7 +107,7 @@ describe('Store', () => {
         }
       })(read);
 
-      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE widgets.priority = $1');
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, is_friendly, priority FROM widgets WHERE widgets.priority = $1');
     });
 
     it('lists resources matching a specified relationship', async () => {
@@ -125,7 +125,7 @@ describe('Store', () => {
         }
       })(read);
 
-      expect(read).to.have.been.calledWith('SELECT widgets.id AS id, widgets.favorite_color AS favorite_color, widgets.priority AS priority FROM widgets INNER JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2');
+      expect(read).to.have.been.calledWith('SELECT widgets.id AS id, widgets.favorite_color AS favorite_color, widgets.is_friendly AS is_friendly, widgets.priority AS priority FROM widgets INNER JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2');
     });
   });
 
@@ -137,7 +137,7 @@ describe('Store', () => {
 
       await new Store(schema).retrieveResource(resourceIdentifier)(read);
 
-      expect(read).to.have.been.calledWith('SELECT id, favorite_color, priority FROM widgets WHERE widgets.id = $1');
+      expect(read).to.have.been.calledWith('SELECT id, favorite_color, is_friendly, priority FROM widgets WHERE widgets.id = $1');
     });
 
     it('retrieves related resources with the appropriate query', async () => {
@@ -177,7 +177,7 @@ describe('Store', () => {
 
       await new Store(schema).updateResource(resource)(write);
 
-      expect(write).to.have.been.calledWith('UPDATE widgets SET favorite_color = $2, priority = $3 WHERE id = $1');
+      expect(write).to.have.been.calledWith('UPDATE widgets SET favorite_color = $2, is_friendly = $3, priority = $4 WHERE id = $1');
     });
 
     it('updates a relationship with the appropriate query', async () => {

@@ -1,7 +1,9 @@
+import toProcessableType from '../../helpers/to-processable-type';
+
 const updateResource = (schema) => (resource) => async (write) => {
   await write(`UPDATE ${schema.table} SET ${schema.columns.map(({ column }, index) => `${column} = $${index + 2}`).join(', ')} WHERE ${schema.id.name} = $1`, [
     resource.id,
-    ...schema.columns.map(({ attribute }) => resource.attributes[attribute])
+    ...schema.columns.map(({ attribute }) => resource.attributes[attribute]).map(toProcessableType)
   ]);
 
   await Promise.all(schema.relationships.map((relationship) => {
@@ -18,7 +20,7 @@ const updateResource = (schema) => (resource) => async (write) => {
 
     return Promise.all(rows.map((row) => write(`INSERT INTO ${relationship.table} (${schema.id.name}, ${relationship.columns.map(({ column }) => column).join(', ')}) VALUES ($1, ${relationship.columns.map((_, index) => `$${index + 2}`).join(', ')}) ON CONFLICT (${schema.id.name}) DO UPDATE SET ${relationship.columns.map(({ column }) => `${column} = EXCLUDED.${column}`).join(', ')}`, [
       resource.id,
-      ...relationship.columns.map(({ attribute }) => row[attribute])
+      ...relationship.columns.map(({ attribute }) => row[attribute]).map(toProcessableType)
     ])));
   }).filter(Boolean));
 

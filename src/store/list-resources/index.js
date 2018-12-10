@@ -1,6 +1,7 @@
 import buildJoinClause from './build-join-clause';
 import buildValues from './build-values';
 import buildWhereClause from './build-where-clause';
+import toProcessableType from '../../helpers/to-processable-type';
 
 const buildStatement = (schema, query) => {
   const joins = buildJoinClause(schema, query);
@@ -18,7 +19,7 @@ const buildStatement = (schema, query) => {
 };
 
 const listResources = (schema) => (query = {}) => async (read) => {
-  const records = await read(buildStatement(schema, query), buildValues(schema, query));
+  const records = await read(buildStatement(schema, query), buildValues(schema, query).map(toProcessableType));
 
   return records.map((record) => ({
     attributes: schema.columns.reduce((attributes, { attribute, column }) => {
