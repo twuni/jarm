@@ -16,18 +16,34 @@ const buildWhereClauseFromId = (schema, id, where = []) => {
   return where;
 };
 
+const buildWhereClauseExpressionsFromRelationship = (definition, relationship, where = []) => {
+  const targets = Array.isArray(relationship.data) ? relationship.data : [relationship.data];
+  let index = where.length + 1;
+
+  const expressions = targets.map((target) => {
+    const expression = [];
+    for (const { attribute, column } of definition.columns) {
+      if (target[attribute]) {
+        expression.push(`${definition.table}.${column} = $${index}`);
+        index += 1;
+      }
+    }
+    return expression.join(' AND ');
+  });
+
+  if (expressions.length > 1) {
+    where.push(`( ${expressions.join(' OR ')} )`);
+  } else {
+    where.push(expressions.join(''));
+  }
+};
+
 const buildWhereClauseFromRelationships = (schema, relationships = {}, where = []) => {
   for (const definition of schema.relationships) {
     const { [definition.name]: relationship } = relationships;
 
     if (relationship) {
-      for (const { attribute, column } of definition.columns) {
-        const { data: { [attribute]: value } } = relationship;
-
-        if (value) {
-          where.push(`${definition.table}.${column} = $${where.length + 1}`);
-        }
-      }
+      buildWhereClauseExpressionsFromRelationship(definition, relationship, where);
     }
   }
 

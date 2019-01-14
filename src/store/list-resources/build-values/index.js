@@ -18,18 +18,26 @@ const buildValuesFromId = (schema, id, values = []) => {
   return values;
 };
 
+const buildValuesFromRelationship = (definition, relationship, values = []) => {
+  const targets = Array.isArray(relationship.data) ? relationship.data : [relationship.data];
+
+  for (const target of targets) {
+    for (const { attribute } of definition.columns) {
+      const { [attribute]: value } = target;
+
+      if (value) {
+        values.push(value);
+      }
+    }
+  }
+};
+
 const buildValuesFromRelationships = (schema, relationships = {}, values = []) => {
   for (const definition of schema.relationships) {
     const { [definition.name]: relationship } = relationships;
 
     if (relationship) {
-      for (const { attribute } of definition.columns) {
-        const { data: { [attribute]: value } } = relationship;
-
-        if (value) {
-          values.push(value);
-        }
-      }
+      buildValuesFromRelationship(definition, relationship, values);
     }
   }
 

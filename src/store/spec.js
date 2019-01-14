@@ -127,6 +127,30 @@ describe('Store', () => {
 
       expect(read).to.have.been.calledWith('SELECT widgets.id AS id, widgets.favorite_color AS favorite_color, widgets.is_friendly AS is_friendly, widgets.priority AS priority FROM widgets INNER JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2');
     });
+
+    it('lists resources matching any of the specified relationships', async () => {
+      const schema = mockSchema();
+      const read = mockRead();
+
+      await new Store(schema).listResources({
+        relationships: {
+          owner: {
+            data: [
+              {
+                id: '<UserId>',
+                type: 'user'
+              },
+              {
+                id: '<AnotherUserId>',
+                type: 'user'
+              }
+            ]
+          }
+        }
+      })(read);
+
+      expect(read).to.have.been.calledWith('SELECT widgets.id AS id, widgets.favorite_color AS favorite_color, widgets.is_friendly AS is_friendly, widgets.priority AS priority FROM widgets INNER JOIN r_widgets_owner ON widgets.id = r_widgets_owner.id WHERE ( r_widgets_owner.owner_id = $1 AND r_widgets_owner.related_type = $2 OR r_widgets_owner.owner_id = $3 AND r_widgets_owner.related_type = $4 )');
+    });
   });
 
   describe('#retrieveResource()', () => {
