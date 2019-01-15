@@ -16,18 +16,28 @@ const buildWhereClauseFromId = (schema, id, where = []) => {
   return where;
 };
 
+const nextIndex = (where = []) => {
+  let index = 1;
+  for (const statement of where) {
+    index += statement.replace(/[^$]/g, '').length;
+  }
+  return index;
+};
+
 const buildWhereClauseExpressionsFromRelationship = (definition, relationship, where = []) => {
   const targets = Array.isArray(relationship.data) ? relationship.data : [relationship.data];
-  let index = where.length + 1;
+  let index = nextIndex(where);
 
   const expressions = targets.map((target) => {
     const expression = [];
+
     for (const { attribute, column } of definition.columns) {
       if (target[attribute]) {
         expression.push(`${definition.table}.${column} = $${index}`);
         index += 1;
       }
     }
+
     return expression.join(' AND ');
   });
 

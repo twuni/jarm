@@ -63,6 +63,17 @@ export const mockSchema = () => ({
         }
       ],
       name: 'owner'
+    },
+    {
+      columns: [
+        {
+          attribute: 'id'
+        },
+        {
+          attribute: 'type'
+        }
+      ],
+      name: 'friend'
     }
   ],
   resource: 'widget',
