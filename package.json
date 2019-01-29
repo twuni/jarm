@@ -1,6 +1,6 @@
 {
   "name": "jarm",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Jarm is JSON-API Relational Mapping -- an ORM layer for Node.js apps.",
   "main": "index.js",
   "repository": "https://github.com/twuni/jarm",
@@ -10,13 +10,11 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "babel --only '**/index.js' --no-comments --compact true --minified --source-maps false --out-dir lib src; cp -vfR package.json yarn.lock README.md LICENSE lib/",
+    "build": "rm -fR lib && babel --only '**/index.js' --no-comments --compact true --minified --source-maps false --out-dir lib src; cp -vfR package.json yarn.lock README.md LICENSE lib/",
     "clean": "rm -fR lib docs .nyc_output",
     "coverage": "nyc report",
-    "docker:start": "yarn install && yarn build && yarn start",
     "documentation": "rm -fR docs; (cd src; find . -type f -name index.js | xargs jsdoc --destination ../docs --package ../package.json --readme ../README.md)",
     "lint": "eslint src",
-    "start": "node lib",
     "test": "find src -type f -name spec.js | xargs nyc --silent --check-coverage --lines 100 --per-file mocha --require @babel/register src/spec.setup.js"
   },
   "devDependencies": {
