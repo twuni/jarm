@@ -60,13 +60,15 @@ const listResources = (schema) => (query = {}, {
     return resources;
   }
 
-  return Promise.all(resources.map(async (resource) => {
+  await Promise.all(resources.map(async (resource) => {
     const relationships = await Promise.all(schema.relationships.map((relationship) => read(`SELECT ${relationship.columns.map(({ column }) => column).join(', ')} FROM ${relationship.table} WHERE ${schema.id.name} = $1`, [resource.id])));
 
     resource.relationships = toResourceRelationships(schema.relationships, relationships);
 
     return resource;
   }));
+
+  return resources;
 };
 
 export default listResources;
