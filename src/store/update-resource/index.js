@@ -24,6 +24,7 @@ const updateResource = (schema) => (resource) => async (write) => {
     ])));
   }).filter(Boolean));
 
+  // eslint-disable-next-line require-atomic-updates
   resource.type = schema.resource;
 
   return resource;
