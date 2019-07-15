@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: "/docker/project"
   docker:
-  - image: twuni/nodejs:11.1.0
+  - image: twuni/nodejs:12.6.0
 
 workflows:
   version: 2
